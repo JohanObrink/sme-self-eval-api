@@ -1,8 +1,11 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm:node-10.19.0'
+- name: node:10.19.0
+  entrypoint: npm
   args: ['ci']
-- name: 'gcr.io/cloud-builders/npm:node-10.19.0'
+- name: node:10.19.0
+  entrypoint: npm
   args: ['run', 'lint']
-- name: 'gcr.io/cloud-builders/npm:node-10.19.0'
+- name: node:10.19.0
+  entrypoint: npm
   args: ['test']
 timeout: "1600s"
