@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/server",
   "engines": {
-    "node": ">=10.19.0"
+    "node": ">=10"
   },
   "scripts": {
     "lint": "eslint ./lib/**/*.js ./__test__/**/*.js --fix",
@@ -32,8 +32,6 @@
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "@semantic-release/changelog": "^5.0.0",
-    "@semantic-release/exec": "^5.0.0",
-    "@semantic-release/git": "^9.0.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-config-prettier-standard": "^3.0.1",
