@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/server",
   "scripts": {
-    "lint": "eslint lib/**/*.js __test__/**/*.js --fix",
+    "lint": "eslint ./lib/**/*.js ./__test__/**/*.js --fix",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "dev": "FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=lightsout nodemon"
@@ -20,7 +20,9 @@
   "homepage": "https://github.com/JohanObrink/sme-self-eval-api#readme",
   "dependencies": {
     "@google-cloud/firestore": "3.7.1",
-    "express": "4.17.1"
+    "express": "4.17.1",
+    "morgan": "1.10.0",
+    "winston": "3.2.1"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -28,6 +30,7 @@
     "eslint-config-prettier-standard": "^3.0.1",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
