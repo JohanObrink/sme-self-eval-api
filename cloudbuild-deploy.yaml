@@ -1,6 +1,7 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: node:10.19.0
+  entrypoint: npm
   args: ['ci', '--production']
-- name: "gcr.io/cloud-builders/gcloud"
-  args: ["app", "deploy"]
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['app', 'deploy']
 timeout: "1600s"
