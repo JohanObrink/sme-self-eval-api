@@ -11,7 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "dev": "FIRESTORE_EMULATOR_HOST=localhost:8080 FIRESTORE_PROJECT_ID=lightsout nodemon",
-    "version": "semantic-release"
+    "auto-version": "semantic-release"
   },
   "repository": {
     "type": "git",
