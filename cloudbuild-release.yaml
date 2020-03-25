@@ -1,6 +1,6 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'gcr.io/cloud-builders/npm:node-10.19.0'
   args: ['ci']
-- name: 'gcr.io/cloud-builders/npm'
+- name: 'gcr.io/cloud-builders/npm:node-10.19.0'
   args: ['run', 'semantic-release']
 timeout: "1600s"
