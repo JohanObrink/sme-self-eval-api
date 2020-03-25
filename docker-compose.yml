@@ -1,0 +1,9 @@
+version: "3"
+services:
+  firestore-emulator:
+    build: .
+    # image: perrystallings/cloud-firestore-emulator
+    environment:
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID}
+    ports:
+      - 8080:8080
