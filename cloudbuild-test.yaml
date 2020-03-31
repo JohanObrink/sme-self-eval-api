@@ -7,5 +7,5 @@ steps:
   args: ['run', 'lint']
 - name: node:10.19.0
   entrypoint: npm
-  args: ['test']
+  args: ['run', 'test:unit']
 timeout: "1600s"
