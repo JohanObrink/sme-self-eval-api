@@ -3,78 +3,167 @@
 const request = require('supertest')
 const app = require('../lib/app')
 const store = require('../lib/stores').get()
+const moment = require('moment')
 
 describe('app', () => {
-  describe('POST /cases', () => {
-    it('persists data', async () => {
-      const data = { foo: 'bar' }
-      let id
-      try {
-        await request(app)
-          .post('/cases')
-          .send(data)
-          .set('Content-Type', 'application/json')
-          .expect(async (res) => {
-            id = res.body.id
-          })
-          .expect(201)
-        const stored = await store.get(`cases/${id}`)
-        expect(stored).toEqual(data)
-      } finally {
-        await store.remove(`cases/${id}`)
-      }
+  describe('/cases', () => {
+    describe('POST /cases', () => {
+      it('persists data', async () => {
+        const data = { foo: 'bar' }
+        let id
+        try {
+          await request(app)
+            .post('/cases')
+            .send(data)
+            .set('Content-Type', 'application/json')
+            .expect(async (res) => {
+              id = res.body.id
+            })
+            .expect(201)
+          const stored = await store.get(`cases/${id}`)
+          expect(stored.data()).toEqual(data)
+        } finally {
+          await store.remove(`cases/${id}`)
+        }
+      })
     })
-  })
-  describe('GET /cases/:id', () => {
-    it('retrieves data', async () => {
-      const id = 'ABC123'
-      const data = { foo: 'bar' }
-      try {
-        await store.create(`cases/${id}`, data)
+    describe('GET /cases/:id', () => {
+      it('retrieves data', async () => {
+        const id = 'ABC123'
+        const data = { foo: 'bar' }
+        try {
+          await store.create(`cases/${id}`, data)
+          await request(app)
+            .get('/cases/abc123')
+            .set('Accept', 'application/json')
+            .expect((res) => {
+              const result = res.body
+              expect(result).toEqual(data)
+            })
+            .expect(200)
+        } finally {
+          await store.remove('cases/ABC123')
+        }
+      })
+      it('returns 404 if document does not exist', async () => {
         await request(app)
           .get('/cases/abc123')
           .set('Accept', 'application/json')
-          .expect((res) => {
-            const result = res.body
-            expect(result).toEqual(data)
-          })
-          .expect(200)
-      } finally {
-        await store.remove('cases/ABC123')
-      }
+          .expect(404)
+      })
     })
-    it('returns 404 if document does not exist', async () => {
-      await request(app)
-        .get('/cases/abc123')
-        .set('Accept', 'application/json')
-        .expect(404)
-    })
-  })
-  describe('PUT /cases/:id', () => {
-    it('updates data', async () => {
-      const id = 'ABC123'
-      const data = { foo: 'bar' }
-      try {
-        await store.create(`cases/${id}`, data)
-        data.foo = 'baz'
+    describe('PUT /cases/:id', () => {
+      it('updates data', async () => {
+        const id = 'ABC123'
+        const data = { foo: 'bar' }
+        try {
+          await store.create(`cases/${id}`, data)
+          data.foo = 'baz'
+          await request(app)
+            .put('/cases/abc123')
+            .send(data)
+            .set('Content-Type', 'application/json')
+            .expect(204)
+          const changed = await store.get(`cases/${id}`)
+          expect(changed.data()).toEqual(data)
+        } finally {
+          await store.remove('cases/ABC123')
+        }
+      })
+      it('returns 404 if document does not exist', async () => {
+        const data = { foo: 'bar' }
         await request(app)
           .put('/cases/abc123')
           .send(data)
           .set('Content-Type', 'application/json')
-          .expect(204)
-        const changed = await store.get(`cases/${id}`)
-        expect(changed).toEqual(data)
-      } finally {
-        await store.remove('cases/ABC123')
-      }
+          .expect(404)
+      })
     })
-    it('returns 404 if document does not exist', async () => {
-      const data = { foo: 'bar' }
-      await request(app)
-        .put('/cases/abc123')
-        .send(data)
-        .set('Content-Type', 'application/json')
-        .expect(404)
+  })
+  describe('/reports', () => {
+    describe('POST /reports', () => {
+      it('persists data', async () => {
+        const data = { foo: 'bar' }
+        let result
+        try {
+          const start = moment().unix()
+          await request(app)
+            .post('/reports')
+            .send(data)
+            .set('Content-Type', 'application/json')
+            .expect(async (res) => {
+              result = res.body
+              expect(result.id).toMatch(/^[\w\d]{6}$/)
+
+              const createTime = moment(result.createTime).unix()
+              expect(createTime).toBeGreaterThanOrEqual(start)
+              expect(createTime).toBeLessThanOrEqual(moment().unix())
+            })
+            .expect(201)
+          const stored = await store.get(`cases/${result.id}`)
+          expect(stored.data()).toEqual(data)
+        } finally {
+          await store.remove(`cases/${result.id}`)
+        }
+      })
+    })
+    describe('GET /reports/:id', () => {
+      it('retrieves data', async () => {
+        const id = 'ABC123'
+        const data = { foo: 'bar' }
+        try {
+          const start = moment().unix()
+          await store.create(`cases/${id}`, data)
+          await request(app)
+            .get('/reports/abc123')
+            .set('Accept', 'application/json')
+            .expect((res) => {
+              const result = res.body
+              expect(result.id).toEqual(id)
+              expect(result.data).toEqual(data)
+
+              const createTime = moment(result.createTime).unix()
+              expect(createTime).toBeGreaterThanOrEqual(start)
+              expect(createTime).toBeLessThanOrEqual(moment().unix())
+            })
+            .expect(200)
+        } finally {
+          await store.remove('cases/ABC123')
+        }
+      })
+      it('returns 404 if document does not exist', async () => {
+        await request(app)
+          .get('/reports/abc123')
+          .set('Accept', 'application/json')
+          .expect(404)
+      })
+    })
+    describe('PUT /reports/:id', () => {
+      it('updates data', async () => {
+        const id = 'ABC123'
+        const data = { foo: 'bar' }
+        try {
+          await store.create(`cases/${id}`, data)
+          data.foo = 'baz'
+          await request(app)
+            .put('/reports/abc123')
+            .send(data)
+            .set('Content-Type', 'application/json')
+            .expect(204)
+          const changed = await store.get(`cases/${id}`)
+          expect(changed.data()).toEqual(data)
+        } finally {
+          await store.remove('cases/ABC123')
+        }
+      })
+      it('returns 404 if document does not exist', async () => {
+        const data = { foo: 'bar' }
+        await request(app)
+          .put('/reports/abc123')
+          .send(data)
+          .set('Content-Type', 'application/json')
+          .expect(404)
+      })
     })
   })
 })

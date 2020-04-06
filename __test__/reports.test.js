@@ -1,4 +1,5 @@
-const { create, get, update, remove } = require('../lib/cases')
+const moment = require('moment')
+const { create, get, update, remove } = require('../lib/reports')
 const store = require('../lib/stores/memorystore')
 jest.mock('../lib/stores/memorystore', () => ({
   create: jest.fn().mockName('store.create').mockResolvedValue(),
@@ -7,9 +8,10 @@ jest.mock('../lib/stores/memorystore', () => ({
   remove: jest.fn().mockName('store.remove').mockResolvedValue()
 }))
 
-describe('cases', () => {
+describe('reports', () => {
   beforeEach(() => {
     store.create.mockRestore()
+    store.create.mockResolvedValue({ writeTime: { seconds: moment().unix() } })
     store.get.mockRestore()
     store.update.mockRestore()
     store.remove.mockRestore()
@@ -24,7 +26,7 @@ describe('cases', () => {
       )
     })
     it('retries if document exists', async () => {
-      store.create.mockRejectedValueOnce()
+      store.create.mockRejectedValueOnce(new Error('Document exists'))
       await create({})
       expect(store.create).toHaveBeenCalledTimes(2)
       expect(store.create).toHaveBeenNthCalledWith(
@@ -34,7 +36,7 @@ describe('cases', () => {
       )
     })
     it('returns a valid id', async () => {
-      const id = await create({})
+      const { id } = await create({})
       expect(id).toMatch(/^[ABCDEFGHIJKLMNPQRSTUVXYZ123456789]{6}$/)
     })
   })
@@ -42,7 +44,7 @@ describe('cases', () => {
     let data
     beforeEach(() => {
       data = { foo: 'bar' }
-      store.get.mockResolvedValue(data)
+      store.get.mockResolvedValue({ data: () => data, createTime: { seconds: moment().unix() } })
     })
     it('retrieves a document', async () => {
       const id = 'ABC123'
@@ -53,7 +55,7 @@ describe('cases', () => {
     it('returns the document data', async () => {
       const id = 'ABC123'
       const result = await get(id)
-      expect(result).toEqual(data)
+      expect(result.data).toEqual(data)
     })
   })
   describe('#update', () => {
