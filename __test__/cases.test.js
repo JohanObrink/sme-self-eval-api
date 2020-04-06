@@ -42,7 +42,7 @@ describe('cases', () => {
     let data
     beforeEach(() => {
       data = { foo: 'bar' }
-      store.get.mockResolvedValue(data)
+      store.get.mockResolvedValue({ data: () => data })
     })
     it('retrieves a document', async () => {
       const id = 'ABC123'

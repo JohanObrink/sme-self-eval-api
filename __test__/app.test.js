@@ -19,7 +19,7 @@ describe('app', () => {
           })
           .expect(201)
         const stored = await store.get(`cases/${id}`)
-        expect(stored).toEqual(data)
+        expect(stored.data()).toEqual(data)
       } finally {
         await store.remove(`cases/${id}`)
       }
@@ -63,7 +63,7 @@ describe('app', () => {
           .set('Content-Type', 'application/json')
           .expect(204)
         const changed = await store.get(`cases/${id}`)
-        expect(changed).toEqual(data)
+        expect(changed.data()).toEqual(data)
       } finally {
         await store.remove('cases/ABC123')
       }

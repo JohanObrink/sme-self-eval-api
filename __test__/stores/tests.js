@@ -9,7 +9,7 @@ module.exports = ({ create, get, update, remove }) => {
       await create(id, data)
 
       const doc = await get(id)
-      expect(doc).toEqual(data)
+      expect(doc.data()).toEqual(data)
     })
     it('throws if a document exists', async () => {
       const data = { herp: 'derp' }
@@ -27,7 +27,7 @@ module.exports = ({ create, get, update, remove }) => {
       await update(id, data)
 
       const doc = await get(id)
-      expect(doc).toEqual(data)
+      expect(doc.data()).toEqual(data)
     })
     it('throws if a document does not exist', async () => {
       const data = { herp: 'derp' }
