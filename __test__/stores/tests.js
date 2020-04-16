@@ -1,4 +1,5 @@
 /* eslint-disable jest/no-export */
+const moment = require('moment')
 
 module.exports = ({ create, get, update, remove }) => {
   const id = 'cases/foo'
@@ -17,6 +18,26 @@ module.exports = ({ create, get, update, remove }) => {
 
       await expect(create(id, data))
         .rejects.toThrow('Document exists')
+    })
+    it('returns id and writeTime', async () => {
+      const start = moment().unix()
+      const data = { herp: 'derp' }
+      const result = await create('cases/foo', data)
+      const end = moment().unix()
+
+      expect(result.id).toEqual('foo')
+      expect(result.writeTime.seconds).toBeGreaterThanOrEqual(start)
+      expect(result.writeTime.seconds).toBeLessThanOrEqual(end)
+    })
+    it('creates id if not supplied', async () => {
+      const start = moment().unix()
+      const data = { herp: 'derp' }
+      const result = await create('cases', data)
+      const end = moment().unix()
+
+      expect(result.id).toEqual(expect.any(String))
+      expect(result.writeTime.seconds).toBeGreaterThanOrEqual(start)
+      expect(result.writeTime.seconds).toBeLessThanOrEqual(end)
     })
   })
   describe('#update', () => {

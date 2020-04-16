@@ -16,7 +16,7 @@ describe('app', () => {
             .post('/cases')
             .send(data)
             .set('Content-Type', 'application/json')
-            .expect(async (res) => {
+            .expect((res) => {
               id = res.body.id
             })
             .expect(201)
@@ -91,7 +91,7 @@ describe('app', () => {
             .post('/reports')
             .send(data)
             .set('Content-Type', 'application/json')
-            .expect(async (res) => {
+            .expect((res) => {
               result = res.body
               expect(result.id).toMatch(/^[\w\d]{6}$/)
 
@@ -163,6 +163,55 @@ describe('app', () => {
           .send(data)
           .set('Content-Type', 'application/json')
           .expect(404)
+      })
+    })
+  })
+  describe('/votes', () => {
+    describe('POST /votes', () => {
+      it('adds a vote', async () => {
+        const data = { reportId: 'abc123', vote: 1 }
+        let result
+        try {
+          await request(app)
+            .post('/votes')
+            .send(data)
+            .set('Content-Type', 'application/json')
+            .expect((res) => {
+              result = res.body
+              expect(result.id).toEqual(expect.any(String))
+            })
+            .expect(201)
+          const stored = await store.get(`votes/${result.id}`)
+          expect(stored.data()).toEqual(data)
+        } finally {
+          await store.remove(`votes/${result.id}`)
+          await store.remove('stats/votes')
+        }
+      })
+      it('updates aggregate', async () => {
+        const votes = []
+        try {
+          // vote 1
+          await request(app)
+            .post('/votes')
+            .send({ reportId: 'abc123', vote: 1 })
+            .set('Content-Type', 'application/json')
+            .then((res) => {
+              votes.push(res.body.id)
+            })
+          // vote 2
+          await request(app)
+            .post('/votes')
+            .send({ reportId: 'cde456', vote: -1 })
+            .set('Content-Type', 'application/json')
+            .then((res) => {
+              votes.push(res.body.id)
+            })
+          // const aggregate = await store.get(`stats/votes`)
+        } finally {
+          await Promise.all(votes.map(id => store.remove(`votes/${id}`)))
+          await store.remove('stats/votes')
+        }
       })
     })
   })
