@@ -207,11 +207,42 @@ describe('app', () => {
             .then((res) => {
               votes.push(res.body.id)
             })
-          // const aggregate = await store.get(`stats/votes`)
+          const aggregate = await store.get('stats/votes')
+          expect(aggregate.data()).toEqual({
+            '-1': 1,
+            1: 1
+          })
         } finally {
           await Promise.all(votes.map(id => store.remove(`votes/${id}`)))
           await store.remove('stats/votes')
         }
+      })
+    })
+  })
+  describe('/stats', () => {
+    describe('GET /stats', () => {
+      let votes
+      beforeEach(async () => {
+        votes = {
+          '-1': 23,
+          1: 158
+        }
+        await store.save('stats/votes', votes)
+      })
+      afterEach(async () => {
+        await store.remove('stats/votes')
+      })
+      it('retrieves stats', async () => {
+        await request(app)
+          .get('/stats')
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect((res) => {
+            const result = res.body
+            expect(result).toEqual({
+              votes
+            })
+          })
       })
     })
   })
