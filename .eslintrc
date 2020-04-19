@@ -1,4 +1,10 @@
 {
-  "extends": ["standard", "plugin:jest/recommended"],
-  "plugins": ["jest"]
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:jest/recommended",
+    "plugin:node/recommended"
+  ],
+  "rules": {
+    "jest/expect-expect": "error"
+  }
 }

@@ -16,8 +16,7 @@ module.exports = ({ create, get, update, remove, save }) => {
       const data = { herp: 'derp' }
       await create(id, data)
 
-      await expect(create(id, data))
-        .rejects.toThrow('Document exists')
+      await expect(create(id, data)).rejects.toThrow('Document exists')
     })
     it('returns id and writeTime', async () => {
       const start = moment().unix()
@@ -53,8 +52,7 @@ module.exports = ({ create, get, update, remove, save }) => {
     it('throws if a document does not exist', async () => {
       const data = { herp: 'derp' }
 
-      await expect(update(id, data))
-        .rejects.toThrow('Document does not exist')
+      await expect(update(id, data)).rejects.toThrow('Document does not exist')
     })
     it('returns id and writeTime', async () => {
       const data = { herp: 'derp' }
