@@ -1,4 +1,4 @@
 runtime: nodejs12
 service: api-test
 env_variables:
-  STORE=memory
+  STORE: 'memory'
