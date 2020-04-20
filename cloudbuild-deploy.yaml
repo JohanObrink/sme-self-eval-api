@@ -3,5 +3,5 @@ steps:
   entrypoint: npm
   args: ['ci', '--production']
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['app', 'deploy']
+  args: ['app', 'deploy', 'app.yaml', 'app-test.yaml']
 timeout: "1600s"
